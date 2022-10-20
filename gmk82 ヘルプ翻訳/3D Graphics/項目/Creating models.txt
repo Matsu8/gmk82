@@ -1,0 +1,112 @@
+モデルの作成
+
+大規模なモデルを描画する必要がある場合、すべての異なる描画関数をすべてのステップで何度も呼び出すのはかなりコストがかかります。
+これを避けるために、モデルを作成できます。
+モデルは、多数の描画プリミティブと形状で構成されます。
+モデルが作成されると、関数を 1 回呼び出すだけで、さまざまな場所にモデルを描画できます。
+モデルは、ファイルからロードしたり、ファイルに保存したりすることもできます。
+
+
+
+さまざまな機能を利用できるようにする前に、重要なポイントが 1 つあります。
+それは、テクスチャの処理です。
+前述のように、テクスチャはスプライトと背景から取得されます。
+テクスチャのインデックスは、さまざまな時点で異なる場合があります。
+その結果、モデルにはテクスチャ情報が含まれません。
+モデルを描画するときにのみ、テクスチャを提供します。
+したがって、モデル内で使用できるテクスチャは 1 つだけです。
+より多くのテクスチャが必要な場合は、それらを 1 つに結合する (そしてテクスチャ座標を慎重に扱う) か、
+複数のモデルを使用する必要があります。
+これの利点は、同じモデルを異なるテクスチャで簡単に描画できることです。
+
+
+
+モデルの作成、ロード、保存、および描画のために、次の関数が存在します。
+・d3d_model_create()
+　新しいモデルを作成し、そのインデックスを返します。
+　このインデックスは、モデルを扱う他のすべての関数で使用されます。
+
+・d3d_model_destroy(ind) 
+　指定されたインデックスのモデルを破棄し、メモリを解放します。
+
+・d3d_model_clear(ind) 
+　指定されたインデックスのモデルをクリアし、
+　そのすべてのプリミティブを削除します。
+
+・d3d_model_save(ind,fname) 
+　モデルを指定されたファイル名に保存します。
+
+・d3d_model_load(ind,fname) 
+　指定されたファイル名からモデルをロードします。
+
+・d3d_model_draw(ind,x,y,z,texid) 
+　位置 (x,y,z) にモデルを描画します。 
+　texid は、使用する必要があるテクスチャです。
+　テクスチャを使用したくない場合は -1 を使用します。
+　モデルを回転またはスケーリングする場合は、前述の変換ルーチンを使用できます。
+
+
+
+各プリミティブ関数には、それをモデルに追加する同等のものがあります。
+関数には、モデルのインデックスである最初の引数があり、
+テクスチャ情報が提供されないことを除いて、前と同じ引数があります。
+
+・d3d_model_primitive_begin(ind,kind) 
+　指定された種類のモデルに 3D プリミティブを追加します
+　pr_pointlist、pr_linelist、pr_linestrip、pr_trianglelist、pr_trianglestrip または pr_trianglefan。
+
+・d3d_model_vertex(ind,x,y,z) 
+　頂点 (x,y,z) をモデルに追加します。
+
+・d3d_model_vertex_color(ind,x,y,z,col,alpha) 
+　独自の色とアルファ値を持つ頂点 (x,y,z) をモデルに追加します。
+
+・d3d_model_vertex_texture(ind,x,y,z,xtex,ytex) 
+　頂点 (x,y,z) をテクスチャ内の位置 (xtex,ytex) でモデルに追加します。
+
+・d3d_model_vertex_texture_color(ind,x,y,z,xtex,ytex,col,alpha) 
+　頂点 (x,y,z) をテクスチャと色の値でモデルに追加します。
+
+・d3d_model_vertex_normal(ind,x,y,z,nx,ny,nz) 
+　頂点 (x,y,z) を法線ベクトル (nx,ny,nz) でモデルに追加します。
+
+・d3d_model_vertex_normal_color(ind,x,y,z,nx,ny,nz,col,alpha) 
+　モデルに頂点 (x,y,z) を法線ベクトル (nx,ny,nz) と独自の色とアルファ値。
+
+・d3d_model_vertex_normal_texture(ind,x,y,z,nx,ny,nz,xtex,ytex) 
+　モデルに頂点 (x,y,z) を法線ベクトル (nx,ny,nz) とテクスチャ位置で追加します。
+
+・d3d_model_vertex_normal_texture_color(ind,x,y,z,nx,ny,nz,xtex,ytex,col,alpha) 
+　モデルに頂点 (x,y,z) を法線ベクトル (nx,ny,nz) とテクスチャで追加しますと色の値。
+
+・d3d_model_primitive_end(ind) 
+　モデル内のプリミティブの記述を終了します。
+
+
+
+プリミティブに加えて、基本的な形状をモデルに追加することもできます。
+ここでも、関数はほとんど同じように見えますが、
+モデル インデックスがあり、テクスチャ情報がありません。
+
+・d3d_model_block(ind,x1,y1,z1,x2,y2,z2,hrepeat,vrepeat) 
+　モデルにブロック形状を追加します。
+
+・d3d_model_cylinder(ind,x1,y1,z1,x2,y2,z2,hrrepeat,vrepeat,closed,steps) 
+　モデルに円柱形状を追加します。
+
+・d3d_model_cone(ind,x1,y1,z1,x2,y2,z2,hrepeat,vrepeat,closed,steps) 
+　モデルに円錐形を追加します。
+
+・d3d_model_ellipsoid(ind,x1,y1,z1,x2,y2,z2,hrepeat,vrepeat,steps) 
+　モデルに楕円形を追加します。
+
+・d3d_model_wall(ind,x1,y1,z1,x2,y2,z2,hrepeat,vrepeat) 
+　モデルに壁の形状を追加します。
+
+・d3d_model_floor(ind,x1,y1,z1,x2,y2,z2,hrepeat,vrepeat) 
+　モデルに床の形状を追加します。
+
+
+
+モデルを使用すると、3D ゲームのグラフィックスを大幅に高速化できるため、
+できる限りモデルを使用する必要があります。
